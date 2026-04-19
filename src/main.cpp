@@ -2,6 +2,7 @@
 
 #include "display/Display.h"
 #include "net/Portal.h"
+#include "game/Game.h"
 
 void setup() {
   Serial.begin(115200);
@@ -9,9 +10,10 @@ void setup() {
 
   Display::init();
   Portal::init();
-  Display::showText("Connect to:", Portal::SSID);
+  Game::init(Portal::SSID);
 }
 
 void loop() {
   Portal::loop();
+  Game::tick(millis());
 }
