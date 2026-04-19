@@ -1,4 +1,5 @@
 #include "game/Arena.h"
+#include "game/FighterRenderer.h"
 #include "display/Display.h"
 #include <Adafruit_SSD1306.h>
 #include <Arduino.h>
@@ -135,6 +136,8 @@ namespace Arena {
     } else {
       drawHUD();
       drawFloor();
+      FighterRenderer::render(*p1);
+      FighterRenderer::render(*p2);
     }
     Display::endFrame();
   }
