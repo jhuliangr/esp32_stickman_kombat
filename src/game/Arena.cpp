@@ -1,6 +1,7 @@
 #include "game/Arena.h"
 #include "game/FighterRenderer.h"
 #include "display/Display.h"
+#include "audio/Audio.h"
 #include <Adafruit_SSD1306.h>
 #include <Arduino.h>
 
@@ -80,7 +81,10 @@ namespace {
     int bx, by, bw, bh; victim.getBodyHitbox(bx, by, bw, bh);
     if (boxesOverlap(ax, ay, aw, ah, bx, by, bw, bh)) {
       int dmg = (ah >= 8) ? 15 : 8;
+      const bool blocked = victim.isBlocking();
       victim.takeDamage(dmg);
+      if (blocked) Audio::playBlock();
+      else         Audio::playHit();
     }
   }
 
@@ -124,6 +128,7 @@ namespace Arena {
         koTimer  = RESTART_MS;
         winner   = p1->isAlive() ? 1 : 2;
         if (winner == 1) winsP1++; else winsP2++;
+        Audio::playKO();
       }
     } else {
       koTimer -= dtMs;

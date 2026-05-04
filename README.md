@@ -26,19 +26,21 @@ virtual gamepad.
 | ------------ | ------------------------------------------------ |
 | ESP32 board  | Any "esp32dev" devkit (ESP32-WROOM-32 etc.)      |
 | OLED display | SSD1306 128x64, I2C (default address `0x3C`)     |
-| 4 jumper wires |                                                |
+| Buzzer       | Passive piezo buzzer (active also works)         |
+| Jumper wires |                                                  |
 
 ### Wiring
 
-| OLED | ESP32       |
-| ---- | ----------- |
-| VCC  | 3.3V        |
-| GND  | GND         |
-| SCL  | GPIO 22     |
-| SDA  | GPIO 21     |
+| OLED   | ESP32   |     | Buzzer | ESP32   |
+| ------ | ------- | --- | ------ | ------- |
+| VCC    | 3.3V    |     | +      | GPIO 17 |
+| GND    | GND     |     | -      | GND     |
+| SCL    | GPIO 22 |
+| SDA    | GPIO 21 |
 
 If your screen does not light up, the address might be `0x3D` instead of
 `0x3C`. Change it in [`src/display/Display.cpp`](src/display/Display.cpp).
+The buzzer pin can be changed in [`src/audio/Audio.cpp`](src/audio/Audio.cpp).
 
 ---
 
@@ -94,6 +96,21 @@ The scoreboard persists for as long as the ESP32 stays powered.
 The pad is fully **multi-touch**: drag the slider with one thumb while
 tapping attack buttons with the other.
 
+### Sound effects
+
+The buzzer plays short non-blocking SFX driven by the same loop as the
+renderer:
+
+| When                                  | Sound                                |
+| ------------------------------------- | ------------------------------------ |
+| First controller page opens           | Ascending C5–E5–G5 arpeggio          |
+| A clean hit lands (HP drops)          | Sharp two-tone snap                  |
+| A hit is soaked by **BLOCK**          | Low dull thud                        |
+| Round ends (KO)                       | Descending 4-note fanfare            |
+
+Each effect preempts the previous one, so the audio always tracks the
+most recent event without queueing up.
+
 ### Tips
 
 - A high KICK is dodged by **DUCKing**, not by blocking.
@@ -112,6 +129,8 @@ The firmware is organised by concern. Each module has a header in
 include/                     src/
   display/                     display/
     Display.h          <---->    Display.cpp        OLED driver wrapper
+  audio/                       audio/
+    Audio.h            <---->    Audio.cpp          Non-blocking buzzer SFX
   game/                        game/
     Fighter.h          <---->    Fighter.cpp        State, input, hitboxes
     FighterRenderer.h  <---->    FighterRenderer.cpp  Stick-figure drawing
@@ -193,6 +212,7 @@ Most knobs live near the top of their module's `.cpp` file:
 | ------------------------ | ---------------------------------------------- |
 | WiFi SSID / password     | `src/net/Portal.cpp` (`SSID`, `AP_PASSWORD`)   |
 | OLED I2C address / pins  | `src/display/Display.cpp`                      |
+| Buzzer pin / SFX tones   | `src/audio/Audio.cpp` (`BUZZER_PIN`, `SFX_*`)  |
 | Walk / run step size     | `src/game/Fighter.cpp` (`WALK_STEP_PX`, `RUN_STEP_PX`) |
 | Attack timings           | `include/game/Fighter.h` (`PUNCH_*`, `KICK_*`) |
 | Damage values            | `src/game/Arena.cpp` (`checkAttack`)           |

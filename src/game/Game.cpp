@@ -1,6 +1,7 @@
 #include "game/Game.h"
 #include "game/Arena.h"
 #include "display/Display.h"
+#include "audio/Audio.h"
 
 #include <Arduino.h>
 
@@ -17,6 +18,7 @@ namespace {
     combatStarted = true;
     lastTick      = millis();
     Serial.printf("[Game] Combat started (%s)\n", reason);
+    Audio::playStart();
   }
 }
 
