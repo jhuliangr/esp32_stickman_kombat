@@ -2,6 +2,7 @@
 #include "game/Arena.h"
 #include "display/Display.h"
 #include "audio/Audio.h"
+#include "net/Sockets.h"
 
 #include <Arduino.h>
 
@@ -54,6 +55,7 @@ namespace Game {
   bool isInCombat() { return combatStarted; }
 
   void reset() {
+    Sockets::closeAll();
     init(savedSsid);
   }
 
