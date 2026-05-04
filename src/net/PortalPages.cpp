@@ -2,6 +2,48 @@
 
 namespace PortalPages {
 
+  String gamesPage() {
+    return String(R"HTML(
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ESP32 Games</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; background: #111; color: #eee; margin: 0; padding: 2em; }
+    h1 { font-size: 2em; margin-bottom: 0.2em; }
+    p.sub { color: #888; margin-top: 0; margin-bottom: 1.5em; font-size: 0.95em; }
+    a.game {
+      display: block; margin: 1em auto; padding: 1.5em;
+      font-size: 1.4em; border-radius: 12px; max-width: 320px;
+      text-decoration: none; color: white;
+      background: linear-gradient(135deg, #1565c0 0%, #c62828 100%);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+    }
+    a.game small { display: block; font-size: 0.7em; opacity: 0.85; margin-top: 0.3em; }
+    a.game.disabled {
+      background: #2a2a2a; color: #666; pointer-events: none;
+      box-shadow: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Choose a game</h1>
+  <p class="sub">Hosted on ESP32-Game</p>
+  <a class="game" href="/stickman">
+    Stickman Kombat
+    <small>2-player fighter</small>
+  </a>
+  <a class="game disabled">
+    More coming soon
+    <small>stay tuned</small>
+  </a>
+</body>
+</html>
+)HTML");
+  }
+
   String selectionPage() {
     return String(R"HTML(
 <!DOCTYPE html>
@@ -9,10 +51,11 @@ namespace PortalPages {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ESP32 Game</title>
+  <title>Stickman Kombat</title>
   <style>
     body { font-family: sans-serif; text-align: center; background: #111; color: #eee; margin: 0; padding: 2em; }
-    h1 { font-size: 2em; }
+    h1 { font-size: 1.8em; margin-bottom: 0.1em; }
+    p.sub { color: #888; margin-top: 0; margin-bottom: 1.5em; font-size: 0.95em; }
     a.button {
       display: block; margin: 1em auto; padding: 1.5em;
       font-size: 1.5em; border-radius: 12px;
@@ -20,12 +63,15 @@ namespace PortalPages {
     }
     .p1 { background: #1565c0; }
     .p2 { background: #c62828; }
+    a.back { color: #888; font-size: 0.95em; text-decoration: none; }
   </style>
 </head>
 <body>
-  <h1>Choose player</h1>
+  <h1>Stickman Kombat</h1>
+  <p class="sub">Choose your side</p>
   <a class="button p1" href="/p1">Player 1</a>
   <a class="button p2" href="/p2">Player 2</a>
+  <p><a class="back" href="/">&larr; back to games</a></p>
 </body>
 </html>
 )HTML");

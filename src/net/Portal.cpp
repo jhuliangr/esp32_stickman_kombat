@@ -18,7 +18,8 @@ namespace {
   DNSServer dnsServer;
   constexpr byte DNS_PORT = 53;
 
-  void handleRoot() { server.send(200, "text/html; charset=utf-8", PortalPages::selectionPage()); }
+  void handleRoot()     { server.send(200, "text/html; charset=utf-8", PortalPages::gamesPage()); }
+  void handleStickman() { server.send(200, "text/html; charset=utf-8", PortalPages::selectionPage()); }
 
   void handleP1() {
     Game::notifyControllerOpened();
@@ -52,8 +53,8 @@ namespace {
   }
 
   // Captive portals work by resolving every DNS query to the AP, so any
-  // request the phone makes ends up on our root handler.
-  void handleNotFound() { server.send(200, "text/html; charset=utf-8", PortalPages::selectionPage()); }
+  // request the phone makes ends up on the games hub.
+  void handleNotFound() { server.send(200, "text/html; charset=utf-8", PortalPages::gamesPage()); }
 }
 
 namespace Portal {
@@ -68,10 +69,11 @@ namespace Portal {
 
     dnsServer.start(DNS_PORT, "*", apIP);
 
-    server.on("/",       handleRoot);
-    server.on("/p1",     handleP1);
-    server.on("/p2",     handleP2);
-    server.on("/action", handleAction);
+    server.on("/",         handleRoot);
+    server.on("/stickman", handleStickman);
+    server.on("/p1",       handleP1);
+    server.on("/p2",       handleP2);
+    server.on("/action",   handleAction);
     server.onNotFound(handleNotFound);
     server.begin();
     Serial.println("[Portal] HTTP server ready");
