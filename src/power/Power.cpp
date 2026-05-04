@@ -39,7 +39,10 @@ namespace {
     esp_deep_sleep_start();
   }
 
-  void onPress() {
+  // `now` comes from tick() so the confirm timer compares two timestamps
+  // captured against the same clock — using millis() inline here would
+  // produce a value newer than `now`, making the unsigned diff underflow.
+  void onPress(unsigned long now) {
     if (Game::isInCombat()) {
       Game::reset();
       confirming = false;
@@ -50,7 +53,7 @@ namespace {
       return;
     }
     confirming        = true;
-    confirmStartedMs  = millis();
+    confirmStartedMs  = now;
     Display::showText("Press again", "to power off");
   }
 }
@@ -73,7 +76,7 @@ namespace Power {
     if (now - lastChangeMs > DEBOUNCE_MS) {
       if (lastReading == LOW && !pressHandled) {
         pressHandled = true;
-        onPress();
+        onPress(now);
       } else if (lastReading == HIGH) {
         pressHandled = false;
       }
