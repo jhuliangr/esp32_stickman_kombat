@@ -1,7 +1,6 @@
 #include "net/Portal.h"
 #include "net/PortalPages.h"
 #include "game/Game.h"
-#include "game/Fighter.h"
 
 #include <Arduino.h>
 #include <WiFi.h>
@@ -28,28 +27,6 @@ namespace {
   void handleP2() {
     Game::notifyControllerOpened();
     server.send(200, "text/html; charset=utf-8", PortalPages::controllerPage(2));
-  }
-
-  void handleAction() {
-    int player  = server.arg("p").toInt();
-    String a    = server.arg("a");
-
-    Fighter::Action action;
-    if      (a == "left")      action = Fighter::Action::LEFT;
-    else if (a == "right")     action = Fighter::Action::RIGHT;
-    else if (a == "run_left")  action = Fighter::Action::RUN_LEFT;
-    else if (a == "run_right") action = Fighter::Action::RUN_RIGHT;
-    else if (a == "punch")     action = Fighter::Action::PUNCH;
-    else if (a == "kick")      action = Fighter::Action::KICK;
-    else if (a == "block")     action = Fighter::Action::BLOCK;
-    else if (a == "duck_on")   action = Fighter::Action::DUCK_ON;
-    else if (a == "duck_off")  action = Fighter::Action::DUCK_OFF;
-    else { server.send(400, "text/plain", "unknown action"); return; }
-
-    if (player != 1 && player != 2) { server.send(400, "text/plain", "invalid player"); return; }
-
-    Game::onPlayerAction(player, action);
-    server.send(204, "text/plain", "");
   }
 
   // Once a player is on the gamepad, OS-level captive-portal probes
@@ -90,7 +67,6 @@ namespace Portal {
     server.on("/stickman", handleStickman);
     server.on("/p1",       handleP1);
     server.on("/p2",       handleP2);
-    server.on("/action",   handleAction);
     server.onNotFound(handleNotFound);
     server.begin();
     Serial.println("[Portal] HTTP server ready");
