@@ -195,8 +195,27 @@ namespace PortalPages {
 (function () {
   const P = __P__;
 
+  function leaveSession() {
+    location.href = '/';
+  }
+
+  // One WebSocket per controller. The server uses ?p=N to route this
+  // socket's messages to the right player. On 'close' (sent by the host
+  // when the match is aborted) or any socket close the page bounces back
+  // to the games hub.
+  let ws;
+  let leaving = false;
+  function connect() {
+    ws = new WebSocket('ws://' + location.hostname + ':81/?p=' + P);
+    ws.addEventListener('message', (e) => {
+      if (e.data === 'close') { leaving = true; leaveSession(); }
+    });
+    ws.addEventListener('close', () => { if (!leaving) leaveSession(); });
+  }
+  connect();
+
   function send(a) {
-    fetch('/action?p=' + P + '&a=' + a, { keepalive: true }).catch(() => {});
+    if (ws && ws.readyState === WebSocket.OPEN) ws.send(a);
   }
 
   const slider = document.getElementById('slider');
