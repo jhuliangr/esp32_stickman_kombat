@@ -52,9 +52,26 @@ namespace {
     server.send(204, "text/plain", "");
   }
 
-  // Captive portals work by resolving every DNS query to the AP, so any
-  // request the phone makes ends up on the games hub.
-  void handleNotFound() { server.send(200, "text/html; charset=utf-8", PortalPages::gamesPage()); }
+  // Once a player is on the gamepad, OS-level captive-portal probes
+  // (Android /generate_204, iOS /hotspot-detect.html, etc.) need to see
+  // a canonical "you're online" response. If we keep replying with HTML,
+  // the OS thinks the network is still captive and yanks the captive
+  // browser back to the foreground, replacing the user's controller page.
+  void handleNotFound() {
+    if (Game::isInCombat()) {
+      String uri = server.uri();
+      if (uri.indexOf("hotspot-detect") >= 0 ||
+          uri.indexOf("library/test/success") >= 0) {
+        server.send(200, "text/html",
+          "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>");
+        return;
+      }
+      server.send(204, "text/plain", "");
+      return;
+    }
+    // Pre-game: serve the hub so the captive-portal popup opens with our UI.
+    server.send(200, "text/html; charset=utf-8", PortalPages::gamesPage());
+  }
 }
 
 namespace Portal {
