@@ -13,4 +13,9 @@ namespace Game {
 
   void onPlayerAction(int player, Fighter::Action a);
 
+  bool isInCombat();
+
+  // Closes any active match and returns to the splash screen.
+  void reset();
+
 }

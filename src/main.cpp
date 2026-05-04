@@ -4,6 +4,7 @@
 #include "net/Portal.h"
 #include "game/Game.h"
 #include "audio/Audio.h"
+#include "power/Power.h"
 
 void setup() {
   Serial.begin(115200);
@@ -11,6 +12,7 @@ void setup() {
 
   Display::init();
   Audio::init();
+  Power::init();
   Portal::init();
   Game::init(Portal::SSID);
 }
@@ -20,4 +22,5 @@ void loop() {
   Portal::loop();
   Game::tick(now);
   Audio::tick(now);
+  Power::tick(now);
 }

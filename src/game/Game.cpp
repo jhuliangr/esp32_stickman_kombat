@@ -51,4 +51,10 @@ namespace Game {
     Arena::tick(dt);
   }
 
+  bool isInCombat() { return combatStarted; }
+
+  void reset() {
+    init(savedSsid);
+  }
+
 }

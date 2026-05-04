@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 namespace {
-  constexpr uint8_t  BUZZER_PIN     = 17;
+  constexpr gpio_num_t  BUZZER_PIN     = GPIO_NUM_17;
   constexpr uint8_t  LEDC_CHANNEL   = 1;  
   constexpr uint8_t  LEDC_RES_BITS  = 8;
   constexpr uint32_t LEDC_BASE_FREQ = 2000;

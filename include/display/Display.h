@@ -14,6 +14,9 @@ namespace Display {
   void endFrame();
   Adafruit_SSD1306& canvas();
 
+  // Powers down the panel (used before deep sleep).
+  void sleep();
+
   constexpr int WIDTH  = 128;
   constexpr int HEIGHT = 64;
 

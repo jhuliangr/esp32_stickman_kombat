@@ -27,20 +27,26 @@ virtual gamepad.
 | ESP32 board  | Any "esp32dev" devkit (ESP32-WROOM-32 etc.)      |
 | OLED display | SSD1306 128x64, I2C (default address `0x3C`)     |
 | Buzzer       | Passive piezo buzzer (active also works)         |
+| Push button  | Any momentary tactile switch (power / reset)     |
 | Jumper wires |                                                  |
 
 ### Wiring
 
-| OLED   | ESP32   |     | Buzzer | ESP32   |
-| ------ | ------- | --- | ------ | ------- |
-| VCC    | 3.3V    |     | +      | GPIO 17 |
-| GND    | GND     |     | -      | GND     |
+| OLED   | ESP32   |     | Buzzer | ESP32   |     | Button | ESP32   |
+| ------ | ------- | --- | ------ | ------- | --- | ------ | ------- |
+| VCC    | 3.3V    |     | +      | GPIO 17 |     | leg A  | GPIO 33 |
+| GND    | GND     |     | -      | GND     |     | leg B  | GND     |
 | SCL    | GPIO 22 |
 | SDA    | GPIO 21 |
+
+The button uses the ESP32's internal pull-up, so no external resistor is
+needed — just wire one leg to GPIO 33 and the other to GND.
 
 If your screen does not light up, the address might be `0x3D` instead of
 `0x3C`. Change it in [`src/display/Display.cpp`](src/display/Display.cpp).
 The buzzer pin can be changed in [`src/audio/Audio.cpp`](src/audio/Audio.cpp).
+The power-button pin can be changed in [`src/power/Power.cpp`](src/power/Power.cpp)
+(must be an RTC-capable GPIO so the chip can wake from deep sleep).
 
 ---
 
@@ -96,6 +102,22 @@ The scoreboard persists for as long as the ESP32 stays powered.
 The pad is fully **multi-touch**: drag the slider with one thumb while
 tapping attack buttons with the other.
 
+### Power button
+
+A single button on GPIO 33 doubles as a power switch and a "give up"
+control:
+
+| Current state                      | Press behaviour                            |
+| ---------------------------------- | ------------------------------------------ |
+| Splash (`Connect to: ESP32-Game`)  | Shows `Press again to power off` for 3 s   |
+| Splash + confirm prompt visible    | Enters deep sleep (acts as powered off)    |
+| Splash + 3 s elapsed without press | Confirm prompt disappears, splash returns  |
+| Mid-fight                          | Aborts the round, returns to splash        |
+| Deep sleep                         | Wakes the chip; full splash + AP come back |
+
+Deep sleep brings the chip down to ~10 µA; on wake the firmware boots
+fresh, so the WiFi AP, the OLED, and the score counter all reset.
+
 ### Sound effects
 
 The buzzer plays short non-blocking SFX driven by the same loop as the
@@ -131,6 +153,8 @@ include/                     src/
     Display.h          <---->    Display.cpp        OLED driver wrapper
   audio/                       audio/
     Audio.h            <---->    Audio.cpp          Non-blocking buzzer SFX
+  power/                       power/
+    Power.h            <---->    Power.cpp          Button + deep sleep / reset
   game/                        game/
     Fighter.h          <---->    Fighter.cpp        State, input, hitboxes
     FighterRenderer.h  <---->    FighterRenderer.cpp  Stick-figure drawing
@@ -213,6 +237,7 @@ Most knobs live near the top of their module's `.cpp` file:
 | WiFi SSID / password     | `src/net/Portal.cpp` (`SSID`, `AP_PASSWORD`)   |
 | OLED I2C address / pins  | `src/display/Display.cpp`                      |
 | Buzzer pin / SFX tones   | `src/audio/Audio.cpp` (`BUZZER_PIN`, `SFX_*`)  |
+| Power-button pin / timeout | `src/power/Power.cpp` (`BUTTON_PIN`, `CONFIRM_TIMEOUT_MS`) |
 | Walk / run step size     | `src/game/Fighter.cpp` (`WALK_STEP_PX`, `RUN_STEP_PX`) |
 | Attack timings           | `include/game/Fighter.h` (`PUNCH_*`, `KICK_*`) |
 | Damage values            | `src/game/Arena.cpp` (`checkAttack`)           |

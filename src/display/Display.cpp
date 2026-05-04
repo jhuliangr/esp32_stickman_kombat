@@ -4,8 +4,8 @@
 #include <Adafruit_GFX.h>
 
 namespace {
-  constexpr int  OLED_SDA   = 21;
-  constexpr int  OLED_SCL   = 22;
+  constexpr gpio_num_t  OLED_SDA   = GPIO_NUM_21;
+  constexpr gpio_num_t  OLED_SCL   = GPIO_NUM_22;
   constexpr int  OLED_RESET = -1;
   constexpr byte OLED_ADDR  = 0x3C;   // try 0x3D if nothing shows up
 
@@ -44,5 +44,9 @@ namespace Display {
   void beginFrame()          { oled.clearDisplay(); }
   void endFrame()            { oled.display(); }
   Adafruit_SSD1306& canvas() { return oled; }
+
+  void sleep() {
+    oled.ssd1306_command(SSD1306_DISPLAYOFF);
+  }
 
 }
